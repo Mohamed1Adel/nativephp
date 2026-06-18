@@ -1,0 +1,48 @@
+name: Build NativePHP Android APK
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install NPM
+        run: npm install
+
+      - name: Build assets
+        run: npm run build
+
+      - name: Install Android tools
+        run: |
+          sudo apt update
+          sudo apt install -y openjdk-17-jdk wget unzip
+          mkdir -p $HOME/android-sdk
+
+      - name: Build APK
+        run: php artisan native:build android
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-apk
+          path: |
+            **/*.apk
