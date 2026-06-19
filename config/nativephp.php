@@ -113,6 +113,12 @@ return [
         // 'NSCameraUsageDescription' => 'Used to take a profile photo.',
         // 'NSMicrophoneUsageDescription' => 'Used to record audio with your videos.',
         // 'NSPhotoLibraryUsageDescription' => 'Used to select photos for your post.',
+                'android.permission.INTERNET',
+                'android.permission.ACCESS_NETWORK_STATE',
+                
+                'android.permission.ACCESS_FINE_LOCATION',
+                'android.permission.ACCESS_COARSE_LOCATION',
+                'android.permission.ACCESS_BACKGROUND_LOCATION',
     ],
 
     /*
