@@ -10,15 +10,9 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      # =========================
-      # Checkout
-      # =========================
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # =========================
-      # PHP Setup
-      # =========================
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -28,9 +22,6 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      # =========================
-      # Node Setup
-      # =========================
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -42,40 +33,32 @@ jobs:
       - name: Build frontend assets
         run: npm run build
 
-      # =========================
-      # Java Setup (Android requirement)
-      # =========================
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      # =========================
-      # Fix NativePHP iOS bug (IMPORTANT)
-      # =========================
-      - name: Prepare NativePHP directories
+      - name: Prepare environment file
         run: |
-          mkdir -p storage/logs
-          mkdir -p ios-build
-          mkdir -p android
+          if [ ! -f .env ]; then
+            cp .env.example .env
+          fi
+          php artisan key:generate --force
+          if grep -q "^NATIVEPHP_APP_ID=" .env; then
+            sed -i "s/^NATIVEPHP_APP_ID=.*/NATIVEPHP_APP_ID=com.ramotech.nativemobile/" .env
+          else
+            echo "NATIVEPHP_APP_ID=com.ramotech.nativemobile" >> .env
+          fi
 
-      - name: Fix missing ios-build.log
-        run: |
-          touch storage/logs/ios-build.log || true
+      - name: Prepare NativePHP log directory
+        run: mkdir -p nativephp
 
-      # =========================
-      # Build APK (NativePHP)
-      # =========================
       - name: Build Android APK
         run: |
           export NATIVEPHP_XCODE_BUILD=false
-          export NATIVEPHP_SKIP_IOS=1
           php artisan native:package android
 
-      # =========================
-      # Upload APK artifact
-      # =========================
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
