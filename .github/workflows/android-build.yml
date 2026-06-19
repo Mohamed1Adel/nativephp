@@ -60,10 +60,25 @@ jobs:
       - name: Install NativePHP Android project
         run: php artisan native:install android --no-interaction
 
+      - name: Decode Android Keystore
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > release.keystore
+
       - name: Build Android APK
+        env:
+          ANDROID_KEYSTORE_FILE: ${{ github.workspace }}/release.keystore
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           export NATIVEPHP_XCODE_BUILD=false
-          php artisan native:package android
+          php artisan native:package android -v
+
+      - name: Debug - list all files
+        if: always()
+        run: |
+          echo "=== Searching for APK/AAB files ==="
+          find . -iname "*.apk" -o -iname "*.aab" 2>/dev/null
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
@@ -72,3 +87,7 @@ jobs:
           path: |
             **/*.apk
             **/build/**/*.apk
+
+      - name: Remove keystore file
+        if: always()
+        run: rm -f release.keystore
