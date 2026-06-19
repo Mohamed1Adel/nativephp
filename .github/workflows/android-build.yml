@@ -58,7 +58,7 @@ jobs:
         run: mkdir -p nativephp
 
       - name: Install NativePHP Android project
-        run: php artisan native:install android --force --no-tty
+        run: php artisan native:install android --force
 
       - name: Decode Android Keystore
         run: |
