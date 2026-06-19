@@ -68,10 +68,10 @@ jobs:
       # Build APK (NativePHP)
       # =========================
       - name: Build Android APK
-        run: |
-          export NATIVEPHP_XCODE_BUILD=false
-          export NATIVEPHP_SKIP_IOS=1
-          php artisan native:package android
+        env:
+            NATIVEPHP_APP_ID: com.ramotech.nativemobile
+            NATIVEPHP_XCODE_BUILD: "false"
+        run: php artisan native:build
 
       # =========================
       # Upload APK artifact
