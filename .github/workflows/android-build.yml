@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -36,9 +37,14 @@ jobs:
           sudo apt update
           sudo apt install -y openjdk-17-jdk wget unzip
           mkdir -p $HOME/android-sdk
+          
+      - name: Create required NativePHP directories
+        run: |
+            mkdir -p storage/logs
+            mkdir -p ios-build
 
       - name: Build APK
-        run: php artisan native:build
+        run: NATIVEPHP_XCODE_BUILD=false php artisan native:build
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
