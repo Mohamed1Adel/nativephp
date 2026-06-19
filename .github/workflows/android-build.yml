@@ -10,47 +10,76 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - name: Checkout
+      # =========================
+      # Checkout
+      # =========================
+      - name: Checkout repository
         uses: actions/checkout@v4
 
+      # =========================
+      # PHP Setup
+      # =========================
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.4
+          extensions: mbstring, intl, zip, bcmath
 
-      - name: Install Composer deps
+      - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
+      # =========================
+      # Node Setup
+      # =========================
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: Install npm
+      - name: Install NPM dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Build assets
+      - name: Build frontend assets
         run: npm run build
 
+      # =========================
+      # Java Setup (Android requirement)
+      # =========================
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      - name: Prepare NativePHP folders
+      # =========================
+      # Fix NativePHP iOS bug (IMPORTANT)
+      # =========================
+      - name: Prepare NativePHP directories
         run: |
           mkdir -p storage/logs
-          mkdir -p android
           mkdir -p ios-build
+          mkdir -p android
 
-      - name: Build APK
+      - name: Fix missing ios-build.log
+        run: |
+          touch storage/logs/ios-build.log || true
+
+      # =========================
+      # Build APK (NativePHP)
+      # =========================
+      - name: Build Android APK
         run: |
           export NATIVEPHP_XCODE_BUILD=false
+          export NATIVEPHP_SKIP_IOS=1
           php artisan native:build
 
+      # =========================
+      # Upload APK artifact
+      # =========================
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: apk
-          path: "**/*.apk"
+          name: android-apk
+          path: |
+            **/*.apk
+            **/build/**/*.apk
