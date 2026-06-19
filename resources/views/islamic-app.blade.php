@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>نور - التطبيق الإسلامي</title>
+<title>ليالي - التطبيق الإسلامي</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 :root {
@@ -178,7 +178,7 @@ body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background: var(--bg)
 <!-- SPLASH -->
 <div class="screen active" id="splash">
     <div class="splash-moon">☪️</div>
-    <div class="splash-title">نور</div>
+    <div class="splash-title">ليالي</div>
     <div class="splash-sub">تطبيقك الإسلامي الشامل</div>
     <div class="splash-bar"><div class="splash-fill"></div></div>
 </div>
@@ -193,7 +193,7 @@ body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background: var(--bg)
             <div style="font-size:22px">☪️</div>
         </div>
         <div style="font-size:13px;color:var(--text2);margin-bottom:2px">السلام عليكم</div>
-        <div style="font-size:24px;font-weight:700">مرحباً بك في نور 🌿</div>
+        <div style="font-size:24px;font-weight:700">مرحباً بك في ليالي 🌿</div>
     </div>
 
     <div class="prayer-widget" onclick="showScreen('prayer')">
