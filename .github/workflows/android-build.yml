@@ -39,6 +39,9 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Prepare environment file
         run: |
           if [ ! -f .env ]; then
@@ -46,13 +49,16 @@ jobs:
           fi
           php artisan key:generate --force
           if grep -q "^NATIVEPHP_APP_ID=" .env; then
-            sed -i "s/^NATIVEPHP_APP_ID=.*/NATIVEPHP_APP_ID=com.ramotech.nativemobile/" .env
+            sed -i "s/^NATIVEPHP_APP_ID=.*/NATIVEPHP_APP_ID=com.example.myapp/" .env
           else
-            echo "NATIVEPHP_APP_ID=com.ramotech.nativemobile" >> .env
+            echo "NATIVEPHP_APP_ID=com.example.myapp" >> .env
           fi
 
       - name: Prepare NativePHP log directory
         run: mkdir -p nativephp
+
+      - name: Install NativePHP Android project
+        run: php artisan native:install android --no-interaction
 
       - name: Build Android APK
         run: |
