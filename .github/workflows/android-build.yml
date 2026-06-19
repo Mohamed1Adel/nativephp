@@ -71,7 +71,7 @@ jobs:
         run: |
           export NATIVEPHP_XCODE_BUILD=false
           export NATIVEPHP_SKIP_IOS=1
-          php artisan native:build
+          php artisan native:package android
 
       # =========================
       # Upload APK artifact
