@@ -10,68 +10,47 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      # =========================
-      # PHP Setup
-      # =========================
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.4
-          extensions: mbstring, intl, zip, bcmath
 
-      - name: Install Composer dependencies
+      - name: Install Composer deps
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      # =========================
-      # Node Setup
-      # =========================
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: Install NPM dependencies
+      - name: Install npm
         run: npm install --no-audit --no-fund
 
-      - name: Build frontend assets
+      - name: Build assets
         run: npm run build
 
-      # =========================
-      # Java Setup (Android requirement)
-      # =========================
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      # =========================
-      # NativePHP preparation
-      # =========================
-      - name: Prepare NativePHP environment
+      - name: Prepare NativePHP folders
         run: |
           mkdir -p storage/logs
           mkdir -p android
           mkdir -p ios-build
 
-      # =========================
-      # Build APK
-      # =========================
-      - name: Build NativePHP APK
+      - name: Build APK
         run: |
           export NATIVEPHP_XCODE_BUILD=false
           php artisan native:build
 
-      # =========================
-      # Upload APK artifact
-      # =========================
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: android-apk
-          path: |
-            **/*.apk
-            **/build/**/*.apk
+          name: apk
+          path: "**/*.apk"
