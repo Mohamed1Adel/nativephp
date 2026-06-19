@@ -2,54 +2,77 @@ name: Build NativePHP Android APK
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
 
     steps:
-
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # =========================
+      # PHP Setup
+      # =========================
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.4
+          extensions: mbstring, intl, zip, bcmath
 
-      - name: Install dependencies
-        run: composer install --no-interaction --prefer-dist
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
+      # =========================
+      # Node Setup
+      # =========================
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
 
-      - name: Install NPM
+      - name: Install NPM dependencies
         run: npm install
 
-      - name: Build assets
+      - name: Build frontend assets
         run: npm run build
 
-      - name: Install Android tools
-        run: |
-          sudo apt update
-          sudo apt install -y openjdk-17-jdk wget unzip
-          mkdir -p $HOME/android-sdk
-          
-      - name: Create required NativePHP directories
-        run: |
-            mkdir -p storage/logs
-            mkdir -p ios-build
+      # =========================
+      # Java Setup (Android requirement)
+      # =========================
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
 
-      - name: Build APK
-        run: NATIVEPHP_XCODE_BUILD=false php artisan native:build
+      # =========================
+      # NativePHP preparation
+      # =========================
+      - name: Prepare NativePHP environment
+        run: |
+          mkdir -p storage/logs
+          mkdir -p android
+          mkdir -p ios-build
 
+      # =========================
+      # Build APK
+      # =========================
+      - name: Build NativePHP APK
+        run: |
+          export NATIVEPHP_XCODE_BUILD=false
+          php artisan native:build
+
+      # =========================
+      # Upload APK artifact
+      # =========================
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-apk
+          name: android-apk
           path: |
             **/*.apk
             **/build/**/*.apk
