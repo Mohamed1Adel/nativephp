@@ -58,7 +58,7 @@ jobs:
         run: mkdir -p nativephp
 
       - name: Install NativePHP Android project
-        run: php artisan native:install android --no-interaction
+        run: php artisan native:install android --force --no-tty
 
       - name: Decode Android Keystore
         run: |
@@ -70,9 +70,11 @@ jobs:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          CI: "true"
+          GRADLE_OPTS: "-Dorg.gradle.daemon=false"
         run: |
           export NATIVEPHP_XCODE_BUILD=false
-          php artisan native:package android -v
+          php artisan native:package android --build-type=release --no-tty -v
 
       - name: Debug - list all files
         if: always()
