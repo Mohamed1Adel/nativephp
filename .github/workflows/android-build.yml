@@ -38,7 +38,7 @@ jobs:
           mkdir -p $HOME/android-sdk
 
       - name: Build APK
-        run: php artisan native:build android
+        run: php artisan native:build
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
@@ -46,3 +46,4 @@ jobs:
           name: app-apk
           path: |
             **/*.apk
+            **/build/**/*.apk
